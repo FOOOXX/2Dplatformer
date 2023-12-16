@@ -4,7 +4,7 @@ public class CoinCounter : MonoBehaviour
 {
     private int _amount;
 
-    public void AddOne()
+    public void AddMoney()
     {
         _amount++;
 

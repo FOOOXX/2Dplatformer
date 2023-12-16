@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(CoinCounter))]
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,16 +14,20 @@ public class PlayerMovement : MonoBehaviour
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
     private RaycastHit2D _hit;
+    private CoinCounter _coinCounter;
 
     private float _moveSpeed;
     private float _jumpForce;
     private float _rayDistance;
+    private float _horizontalDirection;
+    private float _verticalDirection;
 
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _coinCounter = GetComponent<CoinCounter>();
     }
 
     private void Start()
@@ -34,12 +39,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        _horizontalDirection = Input.GetAxisRaw(Horizontal);
+        _verticalDirection = Input.GetAxisRaw(Vertical);
+
         Move();
 
         if (IsGround() == false)
             return;
 
         Jump();
+
+        StartAnimation();
     }
 
     private void LateUpdate()
@@ -49,23 +59,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        float horizontalDirection = Input.GetAxisRaw(Horizontal);
+        transform.Translate(_moveSpeed * Time.deltaTime * _horizontalDirection * transform.right);
 
-        transform.Translate(_moveSpeed * Time.deltaTime * horizontalDirection * transform.right);
-
-        _animator.SetFloat("Speed", Mathf.Abs(horizontalDirection));
-
-        if (horizontalDirection > 0 && _spriteRenderer.flipX)
+        if (_horizontalDirection > 0 && _spriteRenderer.flipX)
             Flip();
-        else if (horizontalDirection < 0 && !_spriteRenderer.flipX)
+        else if (_horizontalDirection < 0 && !_spriteRenderer.flipX)
             Flip();
     }
 
     private void Jump()
     {
-        float verticalDirection = Input.GetAxisRaw(Vertical);
-
-        Vector2 move = new(0f, verticalDirection);
+        Vector2 move = new(0f, _verticalDirection);
 
         _rigidbody2D.AddForce(_jumpForce * move, ForceMode2D.Force);
     }
@@ -80,5 +84,26 @@ public class PlayerMovement : MonoBehaviour
         _hit = Physics2D.Raycast(_rigidbody2D.position, Vector2.down, _rayDistance, LayerMask.GetMask("Ground"));
 
         return _hit.collider != null;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.TryGetComponent<Coin>(out Coin coin))
+        {
+            _coinCounter.AddMoney();
+
+            Destroy(collision.gameObject);
+        }
+    }
+
+    private void StartAnimation()
+    {
+        if (_horizontalDirection != 0)
+        {
+            _animator.SetBool("IsRunning", true);
+            return;
+        }
+
+        _animator.SetBool("IsRunning", false);
     }
 }
