@@ -3,14 +3,14 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     [SerializeField] private Transform _target;
-    private Vector3 _offset;
+    [SerializeField]private Vector3 _offset;
 
     private float _speed;
 
     private void Start()
     {
         _offset = new(0, 0, -7);
-        _speed = 0.1f;
+        _speed = 0.05f;
     }
 
     private void LateUpdate()
