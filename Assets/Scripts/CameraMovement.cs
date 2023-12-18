@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    private PlayerMovement _player;
-    private Vector3 _distanceFromPlayer;
+    [SerializeField] private Transform _target;
+    private Vector3 _offset;
 
     private float _speed;
 
     private void Start()
     {
-        _player = FindObjectOfType<PlayerMovement>();
-
-        _distanceFromPlayer = new(13, 0, -11);
-        _speed = 0.2f;
+        _offset = new(0, 0, -7);
+        _speed = 0.1f;
     }
 
     private void LateUpdate()
     {
-        Vector3 positionToGo = _player.transform.position + _distanceFromPlayer;
-        Vector3 smoothPosition = Vector3.Lerp(_player.transform.position, positionToGo, _speed);
+        Vector3 positionToGo = _target.position + _offset;
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, positionToGo, _speed);
 
-        transform.position = smoothPosition;
+        transform.position = smoothedPosition;
+
+        transform.LookAt(_target);
     }
 }
