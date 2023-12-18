@@ -10,30 +10,32 @@ public class PlayerMovement : MonoBehaviour
     private const string Horizontal = "Horizontal";
     private const string Vertical = "Vertical";
 
+    private const string IsRunning = nameof(IsRunning);
+
     private Rigidbody2D _rigidbody2D;
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
     private RaycastHit2D _hit;
-    private CoinCounter _coinCounter;
 
     private float _moveSpeed;
     private float _jumpForce;
     private float _rayDistance;
     private float _horizontalDirection;
     private float _verticalDirection;
+    private int _isRunning;
 
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _coinCounter = GetComponent<CoinCounter>();
+        _isRunning = Animator.StringToHash(IsRunning);
     }
 
     private void Start()
     {
         _rayDistance = 0.42f;
-        _moveSpeed = 4f;
+        _moveSpeed = 3f;
         _jumpForce = 230f;
     }
 
@@ -48,7 +50,6 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         Jump();
-
         StartAnimation();
     }
 
@@ -86,24 +87,8 @@ public class PlayerMovement : MonoBehaviour
         return _hit.collider != null;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.TryGetComponent<Coin>(out Coin coin))
-        {
-            _coinCounter.AddMoney();
-
-            Destroy(collision.gameObject);
-        }
-    }
-
     private void StartAnimation()
     {
-        if (_horizontalDirection != 0)
-        {
-            _animator.SetBool("IsRunning", true);
-            return;
-        }
-
-        _animator.SetBool("IsRunning", false);
+        _animator.SetBool(_isRunning, _horizontalDirection != 0);
     }
 }
