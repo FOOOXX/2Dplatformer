@@ -3,14 +3,14 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     [SerializeField] private Transform _target;
-    [SerializeField]private Vector3 _offset;
 
+    private Vector3 _offset;
     private float _speed;
 
     private void Start()
     {
-        _offset = new(0, 0, -7);
-        _speed = 0.05f;
+        _offset = new(0, 0, -10);
+        _speed = 0.2f;
     }
 
     private void LateUpdate()
@@ -20,6 +20,6 @@ public class CameraMovement : MonoBehaviour
 
         transform.position = smoothedPosition;
 
-        transform.LookAt(_target);
+        transform.LookAt(_target.position);
     }
 }
